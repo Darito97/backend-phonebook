@@ -27,6 +27,29 @@ app.get('/api/phonenumbers/:id', (req, res) => {
     res.status(404).json({ error: "not_found" })
   }
 })
+app.post('/api/phonenumbers', (req, res) => {
+  const { name, phoneNumber } = req.body
+  if (name && phoneNumber) {
+    let id = Math.max(...phoneBook.map(number => number.id)) + 1
+    let newNumber = { id, name, phoneNumber }
+    phoneBook.push(newNumber)
+    res.status(201).json({ success: true })
+
+  }
+  else {
+    res.status(404).json({ error: "content_not_found" })
+  }
+})
+app.delete('/api/phonenumbers/:id', (req, res) => {
+  let id = Number(req.params.id)
+  if (phoneBook.find(number => number.id === id)) {
+    phoneBook = phoneBook.filter(number => number.id !== id)
+    res.status(200).json({ removed: true })
+  }
+  else {
+    res.status(404).json({ error: 'number_not_found' })
+  }
+})
 
 
 const PORT = 3001
