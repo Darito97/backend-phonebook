@@ -10,7 +10,9 @@ let phoneBook = [
     phoneNumber: "0000000000"
   }
 ]
-
+app.get('/info', (req, res) => {
+  res.status(200).json({ numberOfPhoneNumbers: phoneBook.length })
+})
 app.get('/api/phonenumbers', (req, res) => {
   res.status(200).json(phoneBook)
 })
@@ -24,6 +26,10 @@ app.get('/api/phonenumbers/:id', (req, res) => {
   else {
     res.status(404).json({ error: "not_found" })
   }
+})
 
-}
-)
+
+const PORT = 3001
+app.listen(PORT, () => {
+  console.log(`Servidor funcionando en el puerto ${PORT}`)
+})
