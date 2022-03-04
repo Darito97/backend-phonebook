@@ -50,7 +50,25 @@ app.delete('/api/phonenumbers/:id', (req, res) => {
     res.status(404).json({ error: 'number_not_found' })
   }
 })
-
+app.put('/api/phonenumbers/:id', (req, res) => {
+  let id = Number(req.params.id)
+  const { name, phoneNumber } = req.body
+  if (phoneBook.find(number => number.id === id)) {
+    let index = phoneBook.findIndex(number => number.id === id)
+    phoneBook[index] = {
+      id,
+      name,
+      phoneNumber
+    }
+    res.status(200).json({
+      changed: true
+    })
+  }
+  else {
+    res.status(404).json({ error: 'not_found' })
+  }
+}
+)
 
 const PORT = 3001
 app.listen(PORT, () => {
