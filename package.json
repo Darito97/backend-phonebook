@@ -1,0 +1,11 @@
+{
+  "name": "backend-phonebook",
+  "version": "1.0.0",
+  "description": "backend de una aplicacion de agenda telefonica",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "David Alonso",
+  "license": "ISC"
+}
