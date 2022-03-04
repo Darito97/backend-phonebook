@@ -4,14 +4,16 @@
   "description": "backend de una aplicacion de agenda telefonica",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "David Alonso",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.17.3"
+    "express": "4.17.3"
   },
   "devDependencies": {
-    "nodemon": "^2.0.15"
+    "nodemon": "2.0.15"
   }
 }
