@@ -1,7 +1,18 @@
 const express = require('express')
 const app = express()
 
+const morgan = require('morgan')
+morgan.token('body', function (req) {
+  let { name, phoneNumber } = req.body
+  if (name && phoneNumber) {
+    return `{ name: ${name}, phoneNumber : ${phoneNumber} }`
+  }
+  return ''
+})
+
+
 app.use(express.json())
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
 let phoneBook = [
   {
