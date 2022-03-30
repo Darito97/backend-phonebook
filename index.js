@@ -3,6 +3,15 @@ const morgan = require('morgan')
 const cors = require('cors')
 const app = express()
 
+require('dotenv').config()
+
+const PhoneNumber = require('./models/phoneNumber')
+const { default: mongoose } = require('mongoose')
+const URL = process.env.DB_URL
+
+mongoose.connect(URL).then(res => console.log('connected to mongoDB')).catch(err => console.log('Error to connected mongoDB: ', err))
+
+
 morgan.token('body', function (req) {
   let { name, phoneNumber } = req.body
   if (name && phoneNumber) {
@@ -23,62 +32,72 @@ let phoneBook = [
   }
 ]
 app.get('/info', (req, res) => {
-  res.status(200).json({ numberOfPhoneNumbers: phoneBook.length })
+  PhoneNumber.countDocuments({}).then(count => {
+    res.status(200).json({ numberOfPhoneNumbers: count })
+  }).catch(err => {
+    console.log(err)
+    res.status(500).json({ error: err })
+  })
 })
+
 app.get('/api/phonenumbers', (req, res) => {
-  res.status(200).json(phoneBook)
+  PhoneNumber.find({}).then(response => {
+    res.status(200).json(response)
+  }).catch(err => res.status(404).json({ error: err }))
 })
 
 app.get('/api/phonenumbers/:id', (req, res) => {
   let id = Number(req.params.id)
-  const person = phoneBook.find(number => number.id === id)
-  if (person) {
-    res.status(200).json(person)
-  }
-  else {
-    res.status(404).json({ error: "not_found" })
-  }
+  PhoneNumber.findOne({ id }).then(response => {
+    if (response) {
+      res.status(200).json(response)
+    } else {
+      res.status(404).json({ error: 'Not found' })
+    }
+  }).catch(err => res.status(404).json({ error: err }))
 })
+
 app.post('/api/phonenumbers', (req, res) => {
   const { name, phoneNumber } = req.body
   if (name && phoneNumber) {
-    let id = Math.max(...phoneBook.map(number => number.id)) + 1
-    let newNumber = { id, name, phoneNumber }
-    phoneBook.push(newNumber)
-    res.status(201).json({ success: true })
-
-  }
-  else {
-    res.status(404).json({ error: "content_not_found" })
-  }
-})
-app.delete('/api/phonenumbers/:id', (req, res) => {
-  let id = Number(req.params.id)
-  if (phoneBook.find(number => number.id === id)) {
-    phoneBook = phoneBook.filter(number => number.id !== id)
-    res.status(200).json({ removed: true })
-  }
-  else {
-    res.status(404).json({ error: 'number_not_found' })
-  }
-})
-app.put('/api/phonenumbers/:id', (req, res) => {
-  let id = Number(req.params.id)
-  const { name, phoneNumber } = req.body
-  if (phoneBook.find(number => number.id === id)) {
-    let index = phoneBook.findIndex(number => number.id === id)
-    phoneBook[index] = {
-      id,
-      name,
-      phoneNumber
-    }
-    res.status(200).json({
-      changed: true
+    const phone = new PhoneNumber({
+      name: name,
+      phoneNumber: phoneNumber
+    })
+    phone.save().then(phone => {
+      console.log('saved')
+      res.status(201).json({ success: true })
+    }).catch(err => {
+      console.log(err)
+      res.status(400).json({ error: err })
     })
   }
   else {
-    res.status(404).json({ error: 'not_found' })
+    res.status(400).json({ error: "content_not_found" })
   }
+})
+
+app.delete('/api/phonenumbers/:id', (req, res) => {
+  let id = req.params.id
+  PhoneNumber.findByIdAndDelete(id).then(response => {
+    if (response) {
+      res.status(200).json({ success: true })
+    } else {
+      res.status(404).json({ error: 'Not found' })
+    }
+  }).catch(err => res.status(404).json({ error: err }))
+})
+
+app.put('/api/phonenumbers/:id', (req, res) => {
+  let id = Number(req.params.id)
+  const { name, phoneNumber } = req.body
+  PhoneNumber.findByIdAndUpdate(id, { name, phoneNumber }).then(response => {
+    if (response) {
+      res.status(200).json({ success: true })
+    } else {
+      res.status(404).json({ error: 'Not found' })
+    }
+  }).catch(err => res.status(404).json({ error: err }))
 }
 )
 
