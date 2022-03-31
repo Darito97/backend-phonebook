@@ -89,7 +89,7 @@ app.delete('/api/phonenumbers/:id', (req, res) => {
 })
 
 app.put('/api/phonenumbers/:id', (req, res) => {
-  let id = Number(req.params.id)
+  let id = req.params.id
   const { name, phoneNumber } = req.body
   PhoneNumber.findByIdAndUpdate(id, { name, phoneNumber }).then(response => {
     if (response) {
